@@ -1,0 +1,106 @@
+{
+  "current_version": "v1",
+  "tasks": [
+    {
+      "id": "task-01",
+      "title": "create repo skeleton + streamlit basic UI (upload JD + resumes)",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T11:00:00Z",
+      "finished_at": "2025-01-20T11:30:00Z",
+      "outputs": ["streamlit_app.py", "requirements.txt", ".gitignore", "data/ directory structure"],
+      "notes": "Initial skeleton creation completed"
+    },
+    {
+      "id": "task-02",
+      "title": "text extraction module parser.py (PyMuPDF/pdfplumber fallback)",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T11:30:00Z",
+      "finished_at": "2025-01-20T12:00:00Z",
+      "outputs": ["scoring/parser.py"],
+      "notes": "Text extraction module completed with PyMuPDF and pdfplumber fallback"
+    },
+    {
+      "id": "task-03",
+      "title": "skill extractor skill_extractor.py (extract must-have/good-to-have from JD)",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T12:00:00Z",
+      "finished_at": "2025-01-20T12:30:00Z",
+      "outputs": ["scoring/skill_extractor.py"],
+      "notes": "Skill extraction module completed with AI and keyword fallback"
+    },
+    {
+      "id": "task-04",
+      "title": "scoring engine scoring.py (hard-match + soft-match, weighting configurable)",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T12:30:00Z",
+      "finished_at": "2025-01-20T13:00:00Z",
+      "outputs": ["scoring/scoring.py"],
+      "notes": "Scoring engine completed with hybrid hard/soft matching"
+    },
+    {
+      "id": "task-05",
+      "title": "embeddings module & vector store embeddings.py",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T13:00:00Z",
+      "finished_at": "2025-01-20T13:30:00Z",
+      "outputs": ["scoring/embeddings.py"],
+      "notes": "Embeddings module completed with sentence-transformers and TF-IDF fallback"
+    },
+    {
+      "id": "task-06",
+      "title": "Grok client grok_client.py (wrap API calls, retry, throttling)",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T13:30:00Z",
+      "finished_at": "2025-01-20T14:00:00Z",
+      "outputs": ["scoring/grok_client.py"],
+      "notes": "Grok client completed with retry logic and error handling"
+    },
+    {
+      "id": "task-07",
+      "title": "LLM prompt templates & feedback generator",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T14:00:00Z",
+      "finished_at": "2025-01-20T14:30:00Z",
+      "outputs": ["scoring/feedback.py"],
+      "notes": "Feedback generator completed with AI and template fallback"
+    },
+    {
+      "id": "task-08",
+      "title": "integrate scoring + feedback into Streamlit UI",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T14:30:00Z",
+      "finished_at": "2025-01-20T15:00:00Z",
+      "outputs": ["Updated streamlit_app.py with full integration"],
+      "notes": "Streamlit UI integration completed with all modules"
+    },
+    {
+      "id": "task-09",
+      "title": "tests + small evaluation harness",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T15:00:00Z",
+      "finished_at": "2025-01-20T15:30:00Z",
+      "outputs": ["notebooks/eval.ipynb"],
+      "notes": "Evaluation notebook completed with comprehensive testing"
+    },
+    {
+      "id": "task-10",
+      "title": "package requirements.txt and README.md with run instructions",
+      "status": "done",
+      "assigned_to": "cursor",
+      "started_at": "2025-01-20T15:30:00Z",
+      "finished_at": "2025-01-20T16:00:00Z",
+      "outputs": ["README.md", "requirements.txt"],
+      "notes": "Documentation and packaging completed"
+    }
+  ],
+  "last_updated": "2025-01-20T18:45:00Z"
+}

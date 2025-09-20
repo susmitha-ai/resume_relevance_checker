@@ -1,0 +1,65 @@
+# Environment variables
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Data files
+data/resumes/*
+data/jds/*
+data/extracted_texts/*
+data/results/*
+!data/resumes/.gitkeep
+!data/jds/.gitkeep
+!data/extracted_texts/.gitkeep
+!data/results/.gitkeep
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Database files (sensitive user data)
+*.db
+users.db
+professional_users.db
+production_users.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.temp
