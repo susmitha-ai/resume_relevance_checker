@@ -343,4 +343,5 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 **Built with ❤️ for the global job market**
 
-*Empowering job seekers and employers with intelligent resume analysis technology.*
+*Empowering job seekers and employers with intelligent resume analysis technology.*#   r e s u m e _ r e l e v a n c e _ c h e c k e r  
+ 
