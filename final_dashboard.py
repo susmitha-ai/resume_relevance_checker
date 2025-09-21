@@ -489,8 +489,54 @@ Nice to have:
                         skills = extract_skills_from_jd(st.session_state.jd_text)
                         st.session_state.jd_skills = skills
                         st.success("✅ Skills extracted successfully!")
+                        
+                        # Display extracted skills
+                        if skills.get('must_have') or skills.get('good_to_have'):
+                            st.markdown("#### 📋 Extracted Skills:")
+                            
+                            col1, col2 = st.columns(2)
+                            
+                            with col1:
+                                if skills.get('must_have'):
+                                    st.markdown("**🔴 Must Have Skills:**")
+                                    for skill in skills['must_have'][:10]:  # Show top 10
+                                        st.write(f"• {skill}")
+                                    if len(skills['must_have']) > 10:
+                                        st.write(f"... and {len(skills['must_have']) - 10} more")
+                            
+                            with col2:
+                                if skills.get('good_to_have'):
+                                    st.markdown("**🟡 Good to Have Skills:**")
+                                    for skill in skills['good_to_have'][:10]:  # Show top 10
+                                        st.write(f"• {skill}")
+                                    if len(skills['good_to_have']) > 10:
+                                        st.write(f"... and {len(skills['good_to_have']) - 10} more")
                 except Exception as e:
                     st.error(f"❌ Error extracting skills: {e}")
+            
+            # Show current skills if already extracted
+            if st.session_state.get('jd_skills'):
+                skills = st.session_state.jd_skills
+                if skills.get('must_have') or skills.get('good_to_have'):
+                    st.markdown("#### 📋 Current Extracted Skills:")
+                    
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        if skills.get('must_have'):
+                            st.markdown("**🔴 Must Have Skills:**")
+                            for skill in skills['must_have'][:5]:  # Show top 5
+                                st.write(f"• {skill}")
+                            if len(skills['must_have']) > 5:
+                                st.write(f"... and {len(skills['must_have']) - 5} more")
+                    
+                    with col2:
+                        if skills.get('good_to_have'):
+                            st.markdown("**🟡 Good to Have Skills:**")
+                            for skill in skills['good_to_have'][:5]:  # Show top 5
+                                st.write(f"• {skill}")
+                            if len(skills['good_to_have']) > 5:
+                                st.write(f"... and {len(skills['good_to_have']) - 5} more")
     
     with col2:
         st.markdown("### 📄 Resume Files")
@@ -630,6 +676,28 @@ def display_results():
     
     df = pd.DataFrame(st.session_state.results)
     
+    # Display summary metrics
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        avg_score = df['final_score'].mean()
+        st.metric("Average Score", f"{avg_score:.1f}%")
+    
+    with col2:
+        high_scores = len(df[df['final_score'] >= 80])
+        st.metric("High Scores (80%+)", high_scores)
+    
+    with col3:
+        total_resumes = len(df)
+        st.metric("Total Resumes", total_resumes)
+    
+    with col4:
+        best_score = df['final_score'].max()
+        st.metric("Best Score", f"{best_score:.1f}%")
+    
+    # Enhanced results table
+    st.markdown("### 📋 Detailed Results")
+    
     base_columns = ['resume_file', 'hard_pct', 'soft_pct', 'final_score', 'verdict']
     
     if 'ats_score' in df.columns:
@@ -643,30 +711,139 @@ def display_results():
     
     df_display = df[base_columns].copy()
     
+    # Format missing skills for display
     if 'missing_skills' in df_display.columns:
         df_display['missing_skills'] = df_display['missing_skills'].apply(
             lambda x: ', '.join(x[:3]) + ('...' if len(x) > 3 else '') if isinstance(x, list) else str(x)
         )
     
-    st.dataframe(df_display, use_container_width=True)
+    # Add color coding for scores
+    def color_score(val):
+        if val >= 80:
+            return 'background-color: #d4edda; color: #155724'  # Green
+        elif val >= 60:
+            return 'background-color: #fff3cd; color: #856404'  # Yellow
+        else:
+            return 'background-color: #f8d7da; color: #721c24'  # Red
     
-    st.subheader("📈 Visualizations")
+    styled_df = df_display.style.applymap(color_score, subset=['final_score'])
+    st.dataframe(styled_df, use_container_width=True)
+    
+    # Missing Skills Analysis
+    st.markdown("### 🔍 Missing Skills Analysis")
+    
+    all_missing_skills = []
+    for result in st.session_state.results:
+        if 'missing_skills' in result and isinstance(result['missing_skills'], list):
+            all_missing_skills.extend(result['missing_skills'])
+    
+    if all_missing_skills:
+        from collections import Counter
+        skill_counts = Counter(all_missing_skills)
+        
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.markdown("**Most Common Missing Skills:**")
+            for skill, count in skill_counts.most_common(10):
+                percentage = (count / len(st.session_state.results)) * 100
+                st.write(f"• {skill}: {count} resumes ({percentage:.1f}%)")
+        
+        with col2:
+            # Create a bar chart for missing skills
+            if len(skill_counts) > 0:
+                skills_df = pd.DataFrame(list(skill_counts.items()), columns=['Skill', 'Count'])
+                fig = px.bar(skills_df.head(10), x='Count', y='Skill', 
+                           title="Top 10 Missing Skills", orientation='h')
+                fig.update_layout(height=400)
+                st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("No missing skills identified in the analysis.")
+    
+    # Individual Resume Analysis
+    st.markdown("### 📄 Individual Resume Analysis")
+    
+    for i, result in enumerate(st.session_state.results):
+        with st.expander(f"📄 {result['resume_file']} - Score: {result['final_score']:.1f}% ({result['verdict']})"):
+            col1, col2 = st.columns(2)
+            
+            with col1:
+                st.markdown("**Score Breakdown:**")
+                st.write(f"• Hard Match: {result['hard_pct']:.1f}%")
+                st.write(f"• Soft Match: {result['soft_pct']:.1f}%")
+                st.write(f"• Final Score: {result['final_score']:.1f}%")
+                st.write(f"• Verdict: {result['verdict']}")
+                
+                if 'ats_score' in result:
+                    st.write(f"• ATS Score: {result['ats_score']:.1f}%")
+                    st.write(f"• ATS Grade: {result['ats_grade']}")
+            
+            with col2:
+                if 'missing_skills' in result and result['missing_skills']:
+                    st.markdown("**Missing Skills:**")
+                    for skill in result['missing_skills'][:10]:  # Show top 10
+                        st.write(f"• {skill}")
+                    if len(result['missing_skills']) > 10:
+                        st.write(f"... and {len(result['missing_skills']) - 10} more")
+                else:
+                    st.markdown("**Missing Skills:**")
+                    st.write("✅ No missing skills identified!")
+            
+            # Show feedback
+            if 'feedback' in result:
+                st.markdown("**Improvement Suggestions:**")
+                st.write(result['feedback'])
+    
+    # Enhanced Visualizations
+    st.markdown("### 📈 Enhanced Visualizations")
     
     col1, col2 = st.columns(2)
     
     with col1:
-        fig = px.bar(df, x='resume_file', y='final_score', title="Final Scores by Resume")
+        # Score distribution
+        fig = px.histogram(df, x='final_score', nbins=10, 
+                          title="Score Distribution", 
+                          labels={'final_score': 'Final Score (%)', 'count': 'Number of Resumes'})
         st.plotly_chart(fig, use_container_width=True)
     
     with col2:
-        if 'ats_score' in df.columns:
-            fig = px.scatter(df, x='final_score', y='ats_score', 
-                           hover_data=['resume_file'], title="Final Score vs ATS Score")
-            st.plotly_chart(fig, use_container_width=True)
-        else:
-            fig = px.scatter(df, x='hard_pct', y='soft_pct', 
-                           hover_data=['resume_file'], title="Hard Match vs Soft Match")
-            st.plotly_chart(fig, use_container_width=True)
+        # Verdict distribution
+        verdict_counts = df['verdict'].value_counts()
+        fig = px.pie(values=verdict_counts.values, names=verdict_counts.index, 
+                    title="Verdict Distribution")
+        st.plotly_chart(fig, use_container_width=True)
+    
+    # Comparison chart
+    st.markdown("### 📊 Resume Comparison")
+    
+    fig = px.bar(df, x='resume_file', y=['hard_pct', 'soft_pct'], 
+                title="Hard Match vs Soft Match Comparison",
+                barmode='group')
+    fig.update_layout(xaxis_tickangle=-45)
+    st.plotly_chart(fig, use_container_width=True)
+    
+    # Export options
+    st.markdown("### 💾 Export Results")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        csv = df.to_csv(index=False)
+        st.download_button(
+            label="📥 Download CSV",
+            data=csv,
+            file_name=f"resume_analysis_results_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.csv",
+            mime="text/csv"
+        )
+    
+    with col2:
+        json_data = df.to_json(orient='records', indent=2)
+        st.download_button(
+            label="📥 Download JSON",
+            data=json_data,
+            file_name=f"resume_analysis_results_{pd.Timestamp.now().strftime('%Y%m%d_%H%M%S')}.json",
+            mime="application/json"
+        )
 
 def history():
     st.subheader("📚 Analysis History")

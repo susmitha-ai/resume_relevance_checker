@@ -122,7 +122,7 @@ Expected output format:
 
 def extract_skills_with_keywords(jd_text: str) -> Dict[str, List[str]]:
     """
-    Extract skills using keyword matching and heuristics.
+    Extract skills using enhanced keyword matching and heuristics.
     
     Args:
         jd_text: Job description text
@@ -140,18 +140,24 @@ def extract_skills_with_keywords(jd_text: str) -> Dict[str, List[str]]:
             if skill.lower() in text_lower:
                 mentioned_skills.append(skill.title())
     
+    # Enhanced keyword extraction
+    additional_keywords = extract_additional_keywords(jd_text)
+    mentioned_skills.extend(additional_keywords)
+    
 
     mentioned_skills = list(set(mentioned_skills))
     
 
     must_have_keywords = [
         'required', 'must have', 'essential', 'mandatory', 'necessary',
-        'prerequisite', 'minimum', 'at least', 'should have'
+        'prerequisite', 'minimum', 'at least', 'should have', 'need',
+        'critical', 'important', 'key', 'core', 'fundamental'
     ]
     
     good_to_have_keywords = [
         'preferred', 'nice to have', 'bonus', 'advantage', 'plus',
-        'desirable', 'beneficial', 'helpful', 'would be great'
+        'desirable', 'beneficial', 'helpful', 'would be great',
+        'optional', 'additional', 'extra', 'welcome'
     ]
     
     must_have = []
@@ -278,6 +284,49 @@ def test_skill_extraction():
     print("Extracted Skills:")
     print(f"Must Have: {skills['must_have']}")
     print(f"Good to Have: {skills['good_to_have']}")
+
+def extract_additional_keywords(jd_text: str) -> List[str]:
+    """
+    Extract additional keywords and skills from job description.
+    
+    Args:
+        jd_text: Job description text
+    
+    Returns:
+        List of additional keywords found
+    """
+    keywords = []
+    text_lower = jd_text.lower()
+    
+    # Common technical terms and frameworks
+    tech_patterns = [
+        r'\b(?:react|angular|vue|node\.?js|express|django|flask|spring|laravel)\b',
+        r'\b(?:aws|azure|gcp|docker|kubernetes|jenkins|git|github|gitlab)\b',
+        r'\b(?:sql|mysql|postgresql|mongodb|redis|elasticsearch)\b',
+        r'\b(?:python|java|javascript|typescript|c\+\+|c#|go|rust|php|ruby)\b',
+        r'\b(?:machine learning|ml|ai|artificial intelligence|deep learning|nlp)\b',
+        r'\b(?:agile|scrum|kanban|devops|ci/cd|microservices|api|rest|graphql)\b',
+        r'\b(?:tableau|power bi|excel|sql server|oracle|sap|salesforce)\b',
+        r'\b(?:linux|unix|windows|macos|bash|powershell|shell scripting)\b'
+    ]
+    
+    for pattern in tech_patterns:
+        matches = re.findall(pattern, text_lower, re.IGNORECASE)
+        keywords.extend([match.title() for match in matches])
+    
+    # Extract capitalized words (likely proper nouns/skills)
+    capitalized_words = re.findall(r'\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b', jd_text)
+    keywords.extend(capitalized_words)
+    
+    # Extract words with numbers (versions, years)
+    version_patterns = re.findall(r'\b\w+\s*\d+(?:\.\d+)*\b', jd_text, re.IGNORECASE)
+    keywords.extend(version_patterns)
+    
+    # Remove common words and duplicates
+    common_words = {'the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'a', 'an'}
+    keywords = [kw for kw in keywords if kw.lower() not in common_words and len(kw) > 2]
+    
+    return list(set(keywords))
 
 if __name__ == "__main__":
     test_skill_extraction()
