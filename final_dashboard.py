@@ -299,6 +299,9 @@ def login_page():
                 new_email = st.text_input("Email")
                 new_password = st.text_input("Password", type="password")
                 confirm_password = st.text_input("Confirm Password", type="password")
+                full_name = st.text_input("Full Name")
+                company = st.text_input("Company")
+                role = st.selectbox("Role", ["HR Manager", "Recruiter", "Hiring Manager", "Talent Acquisition", "Other"])
                 submit = st.form_submit_button("Create Account", type="primary")
                 
                 if submit:
@@ -309,7 +312,7 @@ def login_page():
                     elif len(new_password) < 6:
                         st.error("Password must be at least 6 characters")
                     else:
-                        success = user_manager.create_user(new_username.strip(), new_email.strip(), new_password, None, None, "User")
+                        success = user_manager.create_user(new_username.strip(), new_email.strip(), new_password, full_name.strip() if full_name else None, company.strip() if company else None, role)
                         if success:
                             st.success("Account created! Please sign in.")
                         else:
